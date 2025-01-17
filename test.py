@@ -12,7 +12,7 @@ gc = gspread.authorize(credentials)
 
 spreadsheet_url = "https://docs.google.com/spreadsheets/d/1Hmrpoz1EVACFY5lHW7r4v8bEtRRFu8eay7grCojRr3E/edit?gid=0#gid=0"
 sh = gc.open_by_url(spreadsheet_url)
-worksheet = sh.worksheet("tc1")
+worksheet = sh.worksheet("mweb")
 os_version = platform.platform()
 if 'Windows' in os_version:  # windows인 경우
   param_json_path = os.path.dirname(__file__) + '\\json\\'
@@ -48,11 +48,11 @@ def test1(driver):
   etc_func= EtcFunction(driver)
   try:
     home_page.input_move_login_screen(2)
-    home_page.ss_1_2_1_4(json_data[0]['tc4']['use_type'])
+    # home_page.ss_1_2_1_4(json_data[0]['tc4']['use_type'])
     # etc_func.input_login_account_type(2)
-    # value = etc_func.smile_pay_num(2)
+    value = etc_func.smile_pay_num(2)
     input_pass(1)
-    # worksheet.update([[value]], "E3")
+    worksheet.update([[value]], "E3")
   except Exception as e:
     input_fail(1, e)
   try:

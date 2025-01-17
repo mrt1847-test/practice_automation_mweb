@@ -435,7 +435,7 @@ class EtcFunction():
             print(f"이미지 로드 실패: {e}")
 
         try:
-            recognized_text = pytesseract.image_to_string(img, config="--psm 13")
+            recognized_text = pytesseract.image_to_string(img, config="--psm 6")
             print(f"인식된 텍스트: {recognized_text}")
             return recognized_text
         except Exception as e:
@@ -448,49 +448,34 @@ class EtcFunction():
         else:
             pytesseract.pytesseract.tesseract_cmd = "/opt/homebrew/bin/tesseract"
 
-        print(self.driver.contexts)  # 컨텍스트 리스트 확인
-        webview = self.driver.contexts[1]  # 웹뷰 컨텍스트 변수 지정
-        time.sleep(5)
-        self.driver.switch_to.context(webview)  # 웹뷰 컨텍스트로 전환
-        print(self.driver.window_handles)  # 웹뷰 윈도우 전체 핸들 출력
-        print(self.driver.current_window_handle)  # 웹뷰 윈도우 현재 핸들 출력
 
-        # 이미지 로드
-        for handle in self.driver.window_handles:
-            self.driver.switch_to.window(handle)
-            try:
-                screenshot_base64 = self.driver.get_screenshot_as_base64()
-                image_data = base64.b64decode(screenshot_base64)
-                img = Image.open(BytesIO(image_data))
-                img.save("img/smile_pay_all.png")  # 디버깅용 저장
-                iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
-                # print(f"Total iframes found: {len(iframes)}")
-                # for index, iframe in enumerate(iframes):
-                #     iframe_id = iframe.get_attribute('id')
-                #     iframe_name = iframe.get_attribute('name')
-                #     iframe_title = iframe.get_attribute('title')
-                #     print(f"Iframe {index}: id='{iframe_id}', name='{iframe_name}', title='{iframe_title}'")
-                last_three = xpath[-3:]
-                numbers = re.findall(r'\d', last_three)
-                num = ''.join(numbers)
-                self.driver.switch_to.frame(iframes[0])
-                print("Switched to iframe.")
-                element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
-                screenshot_base64 = element.screenshot_as_base64
-                image_data = base64.b64decode(screenshot_base64)
-                img = Image.open(BytesIO(image_data))
-                img.save(f"img/number{num}.png")  # 디버깅용 저장
-                img = cv2.imread(f"img/number{num}.png", cv2.IMREAD_GRAYSCALE)
-                img = cv2.resize(img, None, fx=3, fy=3, interpolation=cv2.INTER_CUBIC)
-                # img = cv2.Canny(img, 50, 150)
-                img = cv2.medianBlur(img, 3)
-                _, img = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY)
+        try:
+            # screenshot_base64 = self.driver.get_screenshot_as_base64()
+            # image_data = base64.b64decode(screenshot_base64)
+            # img = Image.open(BytesIO(image_data))
+            # img.save("img/smile_pay_all.png")  # 디버깅용 저장
+            iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
+            last_three = xpath[-3:]
+            numbers = re.findall(r'\d', last_three)
+            num = ''.join(numbers)
+            self.driver.switch_to.frame(iframes[0])
+            print("Switched to iframe.")
+            element = WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.XPATH, xpath)))
+            screenshot_base64 = element.screenshot_as_base64
+            image_data = base64.b64decode(screenshot_base64)
+            img = Image.open(BytesIO(image_data))
+            img.save(f"img/number{num}.png")  # 디버깅용 저장
+            img = cv2.imread(f"img/number{num}.png", cv2.IMREAD_GRAYSCALE)
+            img = cv2.resize(img, None, fx=2, fy=2, interpolation=cv2.INTER_CUBIC)
+            # img = cv2.Canny(img, 50, 150)
+            img = cv2.medianBlur(img, 3) #노이즈 제거
+            _, img = cv2.threshold(img, 128, 255, cv2.THRESH_BINARY)
 
-                img = cv2.convertScaleAbs(img, alpha=2, beta=0)  # 대비 강화
-                cv2.imwrite(f"img/grey_number{num}.png", img)
-                print("이미지 로드 완료")
-            except Exception as e:
-                print(f"이미지 로드 실패: {e}")
+            img = cv2.convertScaleAbs(img, alpha=2, beta=0)  # 대비 강화
+            cv2.imwrite(f"img/grey_number{num}.png", img)
+            print("이미지 로드 완료")
+        except Exception as e:
+            print(f"이미지 로드 실패: {e}")
         custom_config = r'--oem 1 --psm 6 -c tessedit_char_whitelist=0123456789'
         try:
             recognized_text = pytesseract.image_to_string(img, config=custom_config)
@@ -500,7 +485,7 @@ class EtcFunction():
 
         self.driver.switch_to.default_content()
         print("Switched back to default content.")
-        return recognized_text[:1]
+        return recognized_text
 
 
     def __navigate_to_target_goods_page(self, goods_name):
@@ -624,35 +609,6 @@ class EtcFunction():
         if use_type == 2:
             print("#", "ShoppingCart 1.7.1-2 Test Case 실행")
             # Given 초기화
-            EtcFunction.__reset_given(self)
-
-            EtcFunction.__navigate_to_target_goods_page(self,"3840412506")
-
-            runtext = '메인페이지 > VIP 페이지 > 구매하기 버튼 클릭'
-            print("#", runtext, "시작")
-            time.sleep(1)
-            xpath = '(//android.view.ViewGroup[@resource-id="com.ebay.kr.gmarket:id/clBtn"])[2]'
-            element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-            element.click()
-            print("#", runtext, "종료")
-
-            runtext = '메인페이지 > VIP 페이지 > 구매하기 클릭'
-            print("#", runtext, "시작")
-            time.sleep(3)
-            xpath = '//android.widget.TextView[@content-desc="구매하기"]'
-            element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-            element.click()
-            print("#", runtext, "종료")
-
-            runtext = '메인페이지 > VIP 페이지 > 주문서 > 구매하기 클릭'
-            print("#", runtext, "시작")
-            time.sleep(20)
-            # xpath = '//android.widget.Button[@text="15,000원 결제하기"]'
-            # element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-            # element.click()
-            xpath ='//*[@class="button__total-price"]'
-            EtcFunction.__webview_xpath_select(self, xpath)
-            print("#", runtext, "종료")
             sm_num=[]
             for i in range(11):
                 xpath = f'(//*[@class="KeyboardsNumbers__Grid__Item"])[{i+1}]'
@@ -660,38 +616,29 @@ class EtcFunction():
                 value=EtcFunction.analyse_webview_image(self, xpath)
                 value = value.replace('\n','')
                 sm_num.append(value)
-                self.driver.switch_to.context('NATIVE_APP')
             print(sm_num)
 
             runtext = '메인페이지 > VIP 페이지 > 주문서 > 구매하기 클릭 > 스마일페이 결제 비밀번호 입력'
-            print("#", runtext, "시작")
-            print(self.driver.contexts)  # 컨텍스트 리스트 확인
-            webview = self.driver.contexts[1]  # 웹뷰 컨텍스트 변수 지정
-            time.sleep(5)
-            self.driver.switch_to.context(webview)  # 웹뷰 컨텍스트로 전환
-            print(self.driver.window_handles)  # 웹뷰 윈도우 전체 핸들 출력
-            print(self.driver.current_window_handle)  # 웹뷰 윈도우 현재 핸들 출력
 
-            for handle in self.driver.window_handles:
-                self.driver.switch_to.window(handle)
 
-                iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
-                # print(f"Total iframes found: {len(iframes)}")
-                # for index, iframe in enumerate(iframes):
-                #     iframe_id = iframe.get_attribute('id')
-                #     iframe_name = iframe.get_attribute('name')
-                #     iframe_title = iframe.get_attribute('title')
-                #     print(f"Iframe {index}: id='{iframe_id}', name='{iframe_name}', title='{iframe_title}'")
-                self.driver.switch_to.frame(iframes[0])
+            iframes = self.driver.find_elements(By.TAG_NAME, "iframe")
+            # print(f"Total iframes found: {len(iframes)}")
+            # for index, iframe in enumerate(iframes):
+            #     iframe_id = iframe.get_attribute('id')
+            #     iframe_name = iframe.get_attribute('name')
+            #     iframe_title = iframe.get_attribute('title')
+            #     print(f"Iframe {index}: id='{iframe_id}', name='{iframe_name}', title='{iframe_title}'")
+            self.driver.switch_to.frame(iframes[0])
 
-                sec_num = ""
-                for i in sec_num:
-                    x= sm_num.index(i)+1
-                    xpath = f'(//*[@class="KeyboardsNumbers__Grid__Item"])[{x}]'
-                    element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-                    element.click()
+            sec_num = "466835"
+            for i in sec_num:
+                x= sm_num.index(i)+1
+                xpath = f'(//*[@class="KeyboardsNumbers__Grid__Item"])[{x}]'
+                element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
+                element.click()
             print("#", runtext, "종료")
-            self.driver.switch_to.context('NATIVE_APP')
+
+            time.sleep(20)
 
             sm_num = ",".join(sm_num)
             return sm_num

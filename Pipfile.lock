@@ -589,7 +589,7 @@
                 "sha256:b89b1f62b5cfe8025868556fe82360d6b649d464f75d2655cb966c8f8447ea18"
             ],
             "markers": "python_version >= '3.8'",
-            "version": "==4.27.1"
+            "version": "==4.9.0"
         },
         "setuptools": {
             "hashes": [

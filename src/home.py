@@ -2,7 +2,7 @@ from src.base_pages.base import *
 
 class HomePage():
 
-    implicit_wait = 10
+    implicit_wait = 300
     TIMEOUT = 30
 
     def __init__(self, driver):
@@ -449,6 +449,7 @@ class HomePage():
         element.click()
         print("#", runtext, "종료")
 
+    url = 'https://signinssl-dev.gmarket.co.kr/'
     def input_move_login_screen(self, use_type):
         """
 
@@ -458,46 +459,58 @@ class HomePage():
         :example: common_page_param.input_move_login_screen(2)
 
         """
+        url = 'https://signinssl-dev.gmarket.co.kr/'
 
         if use_type == 2:
-            # 디바이스 접근 권한 허용 승인
+            self.driver.get(self.url)
+            runtext = 'log_on_page > 계정 입력'
+            id = "typeMemberInputId"
+            element = self.driver.find_element(By.ID, id)
+            element.send_keys("cease2505")
+            print("#", runtext)
+
+            runtext = 'log_on_page > 비밀 번호 입력'
+            id = "typeMemberInputPassword"
+            element = self.driver.find_element(By.ID, id)
+            element.send_keys("test1004")
+            time.sleep(2)
+            print("#", runtext)
+
+            runtext = 'log_on_page > 로그인 버튼 클릭'
+            id = "btn_memberLogin"
+            element = self.driver.find_element(By.ID, id)
+            element.click()
+            print("#", runtext)
+
+            runtext = 'vip 페이지로 이동'
+            vip_url = 'http://item-dev.gmarket.co.kr/item?goodscode='
+            goods_number = "1102941477"
+            self.driver.get(vip_url + str(goods_number))  # 브라우저 URL 불러오기
+            print("#", runtext)
+
+            runtext = 'vip 페이지 > 구매하기 클릭'
+            id = 'coreInsOrderBtn'
+            element = self.driver.find_element(By.ID, id)
+            element.click()
+            print("#", runtext)
+
+            runtext = '주문서 > 구매하기 클릭'
+
+            xpath = '//*[@id="content"]/div/div[2]/div/div[2]/div/div/button'
+            element = self.driver.find_element(By.XPATH, xpath)
+            element.click()
+            time.sleep(5)
+            print("얼럿창 확인")
             try:
-                time.sleep(2)
-                runtext = '디바이스 접근 권한 허용 승인'
-                print("#", runtext, "시작")
-                id = "com.ebay.kr.gmarket:id/appPermissionBtn"
-                element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, id)))
+                alert = self.driver.switch_to.alert
+                alert.accept()
+                time.sleep(5)
+                xpath = '//*[@id="content"]/div/div[2]/div/div[2]/div/div/button'
+                element = self.driver.find_element(By.XPATH, xpath)
                 element.click()
-                print("#", runtext, "종료")
             except:
-                print("Not Permission popup")
-
-
-            # 지마켓 Notification 허용 알림 승인
-            try:
-                time.sleep(2)
-                runtext = '지마켓 Notification 허용 알림 승인'
-                print("#", runtext, "시작")
-                xpath = "/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.LinearLayout[2]/android.widget.Button[1]"
-                element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.XPATH, xpath)))
-                element.click()
-                print("#", runtext, "종료")
-            except Exception as e:
-                print("Not Notification popup", e)
-                raise
-
-            # 빅스마일데이 팝업 끄기
-            try:
-                time.sleep(2)
-                runtext = '빅스마일데이 팝업 끄기'
-                print("#", runtext, "시작")
-                id = "com.ebay.kr.gmarket:id/ivClose"
-                element = WebDriverWait(self.driver, 10).until(EC.element_to_be_clickable((By.ID, id)))
-                element.click()
-                time.sleep(3)
-                print("#", runtext, "종료")
-            except Exception as e:
-                print("Not Notification popup", e)
+                print("얼럿창 미노출")
+            print("#", runtext)
         else:
             print("#", "권한 팝업 처리하지 않음")
 
