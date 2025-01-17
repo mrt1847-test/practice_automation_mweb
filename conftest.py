@@ -17,10 +17,14 @@ with open('config.json', 'r', encoding='utf-8') as config_file:
 def driver():
     # 디바이스 및 앱 정보 설정pip
     os_version = platform.platform()
+    mobile_emulation = {
+        "deviceName": "iPhone X"  # 사용하고 싶은 디바이스 이름
+    }
     if 'Windows' in os_version:
-        opts = selenium.webdriver.ChromeOptions()
-        opts.add_argument("--start-maximized")
-        driver = selenium.webdriver.Chrome(options=opts, executable_path="c:/webdriver/chromedriver.exe")
+        chrome_options = selenium.webdriver.ChromeOptions()
+        chrome_options.add_experimental_option("mobileEmulation", mobile_emulation)
+        chrome_options.add_argument("--start-maximized")
+        driver = selenium.webdriver.Chrome(options=chrome_options, executable_path="c:/webdriver/chromedriver.exe")
     elif 'mac' in os_version:
         opts = selenium.webdriver.ChromeOptions()
         opts.add_argument("--start-maximized")

@@ -488,15 +488,30 @@ class HomePage():
             self.driver.get(vip_url + str(goods_number))  # 브라우저 URL 불러오기
             print("#", runtext)
 
+            runtext = '팝업 처리'
+            try:
+                id = '//*[@id="popcorn"]/div[1]/div/div[1]/button/svg/path'
+                element = self.driver.find_element(By.XPATH, id)
+                element.click()
+            except:
+                print("팝업 미노출")
+            print("#", runtext)
+
             runtext = 'vip 페이지 > 구매하기 클릭'
-            id = 'coreInsOrderBtn'
-            element = self.driver.find_element(By.ID, id)
+            id = '//*[@id="vipOptionArea"]/div[1]/div/div[2]/span[1]/a'
+            element = self.driver.find_element(By.XPATH, id)
+            element.click()
+            print("#", runtext)
+
+            runtext = 'vip 페이지 > 구매하기 클릭'
+            id = '//*[@id="vipOption"]/div[2]/div[2]/div[1]/div/span[1]/a'
+            element = self.driver.find_element(By.XPATH, id)
             element.click()
             print("#", runtext)
 
             runtext = '주문서 > 구매하기 클릭'
 
-            xpath = '//*[@id="content"]/div/div[2]/div/div[2]/div/div/button'
+            xpath = '//*[@class="button__total-price"]'
             element = self.driver.find_element(By.XPATH, xpath)
             element.click()
             time.sleep(5)
@@ -505,7 +520,7 @@ class HomePage():
                 alert = self.driver.switch_to.alert
                 alert.accept()
                 time.sleep(5)
-                xpath = '//*[@id="content"]/div/div[2]/div/div[2]/div/div/button'
+                xpath = '//*[@class="button__total-price"]'
                 element = self.driver.find_element(By.XPATH, xpath)
                 element.click()
             except:
